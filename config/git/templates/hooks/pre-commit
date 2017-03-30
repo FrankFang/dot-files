@@ -1,0 +1,12 @@
+repository_email=$(git config user.email)
+repository_name=$(git config user.name)
+
+if [ -z "$repository_email" ] || [ -z "$repository_name" ]; then
+    # user.email is empty
+    echo "ERROR: [pre-commit hook] Aborting commit because user.email or user.name is missing."
+    echo "出错了，你还没有配置 user.email 或 user.name "
+    exit 1
+else  
+    # user.email is not empty
+    exit 0
+fi 

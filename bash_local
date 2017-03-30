@@ -1,0 +1,10 @@
+export EDITOR='vim'
+alias ga='git add'
+alias gc='git commit -v'
+alias gst='git status -sb'
+
+alias gcfrank='git config user.name frankfang; git config user.email frankfang1990@gmail.com; git commit -v'
+alias j='z'
+
+[ -f ~/.repos/z/z.sh ] && source  ~/.repos/z/z.sh
+

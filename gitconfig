@@ -1,0 +1,41 @@
+[core]
+	editor = nvim
+	autocrlf = input
+    quotepath = false
+	excludesfile = /Users/frank/.config/git/ignore
+[push]
+	default = simple
+[filter "media"]
+	required = true
+	clean = git media clean %f
+	smudge = git media smudge %f
+[diff]
+	;tool = vimdiff
+[difftool]
+	prompt = false
+[init]
+    templatedir = ~/.config/git/templates
+[http]
+	;proxy = socks5://localhost:1080
+[https]
+	;proxy = socks5://localhost:1080
+[filter "lfs"]
+	clean = git-lfs clean %f
+	smudge = git-lfs smudge %f
+	required = true
+[alias]
+    cl =  !sh -c 'git log $1...$2  --pretty=format:\"%s [查看 commit](http://gitlab.com/$3/$4/commit/%H) \"' -
+    checkpoint = !git stash; git stash apply
+    co = !sh -c 'git stash; git stash apply; git checkout "$*"'
+[user]
+	useconfigonly = true
+	name = 
+	email = 
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[commit]
+	template = /Users/frank/.stCommitMsg
