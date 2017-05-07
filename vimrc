@@ -7,12 +7,11 @@ set autochdir
 set shortmess=a
 set autowriteall
 
-inoremap <C-L> <Esc>:<c-u>wa<CR>
-nnoremap <C-L> <Esc>:<c-u>wa<CR>
-
 call plug#begin('~/.vim/plugged')
 Plug 'Shutnik/jshint2.vim'
 Plug 'posva/vim-vue'
+Plug 'mhinz/vim-startify'
+Plug 'mxw/vim-jsx'
 Plug 'Yggdroot/indentLine'
 Plug 'vim-scripts/vim-auto-save'
 Plug 'vim-ruby/vim-ruby'
@@ -60,6 +59,7 @@ Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'tomtom/tlib_vim'
 Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets'
+Plug 'tpope/vim-fugitive'
 
 "neovim
 "Plug 'Shougo/deoplete.nvim'
@@ -112,8 +112,9 @@ nnoremap <leader>f :<C-u>NERDTreeFind<CR>
 
 " NERDTree tabs
 let g:nerdtree_tabs_open_on_console_startup = 0
+let g:nerdtree_tabs_open_on_gui_startup = 0
 let g:nerdtree_tabs_open_on_new_tab = 0
-let g:nerdtree_tabs_autofind = 0
+let g:nerdtree_tabs_autofind = 1
 
 nnoremap <leader>k :Bclose<CR>
 
@@ -130,13 +131,21 @@ let g:ctrlp_custom_ignore = {
       \ }
 nnoremap <leader>b :b#<CR>
 nnoremap <c-b> :CtrlPBuffer<CR>
-inoremap <c-b> <ESC>:CtrlPBuffer<CR>
+inoremap <c-b> <c-o>:CtrlPBuffer<CR>
 nnoremap <c-e> :CtrlPMRUFiles<CR>
-inoremap <c-e> <ESC>:CtrlPMRUFiles<CR>
-noremap <c-g> <ESC>:Ag<CR>
+inoremap <c-e> <c-o>:CtrlPMRUFiles<CR>
+noremap <c-g> <c-o>:Ag<CR>
 let g:ctrlp_use_caching = 0
 set grepprg=ag\ --nogroup\ --nocolor
 let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_root_markers = ['.git']
+
+let g:ctrlp_prompt_mappings = {
+      \ 'ToggleType(1)':        ['<tab>', '<c-up>'],
+      \ 'ToggleType(-1)':       ['<s-tab>', '<c-down>'],
+      \ 'PrtExpandDir()':       ['<c-f>'],
+      \ }
 
 
 autocmd Filetype ruby,coffee,sass,scss,jade,erb setlocal ts=2 sw=2
@@ -219,6 +228,8 @@ endfunction
 noremap ;; :%s:::g<Left><Left><Left>
 noremap ;' :%s:::cg<Left><Left><Left><Left>
 autocmd FileType coffee,erb,html,css,scss,rb setlocal foldmethod=indent
+"autocmd FileType javascript set formatprg=prettier\ --stdin\ --print-width\ 120\ --single-quote\ true\ --trailing-comma\ es5\ --semi\ false
+"autocmd BufWritePre *.js exe "normal! gggqG\<C-o>\<C-o>"
 map 0 ^
 map j gj
 map k gk
@@ -252,7 +263,7 @@ set switchbuf=usetab
 set nolinebreak
 set noswapfile
 set nowb
-set nowrap
+set wrap
 set pastetoggle=<F4>
 set relativenumber
 set number
@@ -340,6 +351,7 @@ function! s:nerdtree_settings()
   nmap <buffer> <ESC>   :NERDTreeClose<CR>
   nmap <buffer> <c-c>   :NERDTreeClose<CR>
   nmap <buffer> `   :NERDTreeClose<CR>
+  nmap <buffer> q   :NERDTreeClose<CR>
 endfunction
 
 "airline
@@ -356,3 +368,37 @@ nnoremap <leader>rr :<c-u>!bin/rake routes<CR>
 nnoremap <leader>rv :<c-u>Eview<CR>
 nnoremap <leader>rc :<c-u>Econtroller<CR>
 
+" jsx
+let g:jsx_ext_required = 0
+
+" startify
+
+    let g:startify_enable_special         = 0
+    let g:startify_files_number           = 8
+    let g:startify_relative_path          = 1
+    let g:startify_change_to_dir          = 1
+    let g:startify_update_oldfiles        = 1
+    let g:startify_session_autoload       = 1
+    let g:startify_session_persistence    = 1
+
+    let g:startify_skiplist = [
+            \ 'COMMIT_EDITMSG',
+            \ '.*\/doc\/.*',
+            \ ]
+
+    let g:startify_bookmarks = [
+            \ { 'c': '~/.vimrc' },
+            \ ]
+
+    let g:startify_custom_header =
+            \ startify#fortune#cowsay('═','║','╔','╗','╝','╚')
+
+    let g:startify_custom_footer =
+           \ ['', "   Vim is charityware. Please read ':help uganda'.", '']
+
+    let g:startify_list_order = ['files', 'bookmarks', 'sessions', 'commands']
+
+nnoremap <leader>h :<c-u>cd %:h<CR>
+nnoremap <leader>b :<c-u>silent exec "!open %:p"<CR>
+autocmd FileType javascript imap <buffer> <c-l> <c-o>:<c-u>silent exec "!prettier --single-quote --trailing-comma es5 --print-width 120 --semi false --write %:p" \| echon '已格式化' <CR>
+autocmd FileType javascript nmap <buffer> <c-l> :<c-u>silent exec "!prettier --single-quote --trailing-comma es5 --print-width 120 --semi false --write %:p" \| echon '已格式化' <CR>

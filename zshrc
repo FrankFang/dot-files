@@ -13,7 +13,7 @@ export NVM_DIR="/Users/frank/.nvm"
 if [[ -f ~/repos/zsh-git-prompt/zshrc.sh ]]; then 
   source  ~/repos/zsh-git-prompt/zshrc.sh 
   PROMPT='
-%{$fg[red]%}$%{$reset_color%} %{$fg[yellow]%}%~%{$reset_color%} 💡  $(git_super_status)
+%{$fg[red]%}$%{$reset_color%} %{$fg[yellow]%}%~%{$reset_color%} $(git_super_status)
 # '
 fi
 #export PHANTOMJS_CDNURL="http://cnpmjs.org/downloads"
@@ -40,16 +40,21 @@ export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
 export XDG_CONFIG_HOME=${ZDOTDIR:-$HOME}/.config
 export N_PREFIX=${ZDOTDIR:-$HOME}/bin
 export JSBIN_CONFIG=${ZDOTDIR:-$HOME}/.jsbin.config.json
-export HOMEBREW_EDITOR="vim"
-export SVN_EDITOR="vim"
-export EDITOR="vim"
-export VISUAL="vim"
+export HOMEBREW_EDITOR="mvim"
+export SVN_EDITOR="mvim"
+export EDITOR="mvim"
+export VISUAL="mvim"
 export TERM=xterm-256color
 export PROXYCHAINS_QUIET_MODE=1
 export LDFLAGS="-L/usr/local/opt/openssl/lib"
 export CPPFLAGS="-I/usr/local/opt/openssl/include"
 export ANDROID_SDK_ROOT="/Users/frank/Library/Android/sdk"
 
+alias lintjs='prettier --single-quote --trailing-comma es5 --print-width 120 --semi false --write "{demos,lib}/**/*.js"'
+alias rmigrate="bin/rake db:migrate"
+alias rdrop="bin/rake db:drop"
+alias rreset="bin/rake db:drop db:create db:migrate db:seed"
+alias rclear="bin/rake tmp:cache:clear"
 alias showusers="cut -d: -f1 /etc/passwd"
 alias copysite='wget -p -H -e robots=off '
 alias vmrun='/Applications/VMware\ Fusion.app/Contents/Library/vmrun'
@@ -58,7 +63,7 @@ alias showubuntuip='vmrun getGuestIPAddress /Volumes/Seagate\ Backup\ Plus\ Driv
 alias stopubuntu='vmrun -T fusion stop /Volumes/Seagate\ Backup\ Plus\ Drive/虚拟机/Ubuntu\ 64.vmwarevm/Ubuntu\ 64.vmx hard'
 alias request='curl -i -L'
 alias rs='echo "bundle exec rails server"; bundle exec rails server'
-alias rt='echo "bundle exec rails test"; bundle exec rails test'
+alias rt='echo "bundle exec rails test"; RAILS_ENV=test ./bin/rails webpacker:compile; bundle exec rails test'
 alias ls='ls --color'
 alias subl='open -a "Sublime Text"'
 alias showdevices='ffmpeg -f avfoundation -list_devices true -i ""'
@@ -126,12 +131,11 @@ alias dns8="sudo networksetup -setdnsservers Wi-Fi 8.8.8.8; echo 8.8.8.8"
 alias vpnopen="scutil --nc start '云梯 新加坡1号 PPTP'"
 alias vpnclose="scutil --nc stop '云梯 新加坡1号 PPTP'"
 alias tmux='tmux -2'
-alias vi="vim"
-alias i="vim"
+alias vi="mvim"
+alias i="mvim"
 alias flushdns="sudo killall -HUP mDNSResponder &&  echo 'DNS cache flushed.'"
 alias dnsreset="sudo networksetup -setdnsservers Wi-Fi Empty"
 alias dnsv2="sudo networksetup -setdnsservers Wi-Fi 178.79.131.110"
-alias h="vim /etc/hosts"
 
 unalias z
 j() {
@@ -168,7 +172,7 @@ groot() {
 
 export FZF_COMPLETION_OPTS='+c -x'
 export FZF_DEFAULT_COMMAND='ag -l -g ""'
-#alias f='vim $(fzf --query="" --select-1 --exit-0 -x)'
+#alias f='mvim $(fzf --query="" --select-1 --exit-0 -x)'
 f() {
   local file
   q=$1
@@ -176,7 +180,7 @@ f() {
   #file=$(ag -l -g ""| fzf --query="$q" --select-1 --exit-0 -x)
   file=$( fzf --query="" --select-1 --exit-0 -x)
   if [ -n "$file" ] ;then
-    vim "$file"
+    mvim "$file"
   fi
   echo "fzf: bye"
 }
@@ -206,7 +210,7 @@ fs(){
   #grep --line-buffered --color=never -rh "$q" * | fzf 
   result=$(ag "$q" | fzf)
   IFS=':' read file line other <<< "$result"
-  [ -n "$file" ] && vim "$file" +"$line";
+  [ -n "$file" ] && mvim "$file" +"$line";
 }
 
 checkport(){
@@ -230,3 +234,4 @@ export PATH="/usr/local/opt/icu4c/sbin:$PATH"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
