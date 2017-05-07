@@ -3,12 +3,14 @@ if &compatible
 endif
 set hidden
 
-set autochdir
+set noautochdir
 set shortmess=a
 set autowriteall
 
 call plug#begin('~/.vim/plugged')
 Plug 'Shutnik/jshint2.vim'
+Plug 'rhysd/committia.vim'
+Plug 'dbakker/vim-projectroot'
 Plug 'posva/vim-vue'
 Plug 'mhinz/vim-startify'
 Plug 'mxw/vim-jsx'
@@ -45,7 +47,7 @@ Plug 'mattn/emmet-vim'
 Plug 'romainl/flattened'
 Plug 'scrooloose/nerdcommenter'
 Plug 'scrooloose/nerdtree'
-Plug 'jistr/vim-nerdtree-tabs'
+"Plug 'jistr/vim-nerdtree-tabs'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'airblade/vim-rooter'
 Plug 'vim-scripts/gitignore'
@@ -103,18 +105,54 @@ set noshowmode
 set autoread
 set iskeyword=@,$,48-57,192-255,_
 
+" project
+
+function! <SID>AutoProjectRootCD()
+  try
+    if &ft != 'help'
+      ProjectRootCD
+    endif
+  catch
+    echon 'error'
+  endtry
+endfunction
+
+autocmd BufEnter * call <SID>AutoProjectRootCD()
+
 " nerdtree
 let g:NERDTreeWinPos = "right"
-let NERDTreeChDirMode=2
-let NERDTreeQuitOnOpen=1
-nnoremap <leader>f :<C-u>NERDTreeFind<CR>
-"nnoremap <leader>e :<C-u>NERDTree .<CR>\|:wincmd p<CR>
+let NERDTreeChDirMode=0
+let NERDTreeQuitOnOpen=0
+nnoremap <silent> <leader>f :<c-u>ProjectRootExe NERDTreeFind<cr>
+autocmd FileType nerdtree call s:nerdtree_settings()
+function! s:nerdtree_settings()
+  " Play nice with supertab
+  " Enable navigation with control-j and control-k in insert mode
+  nmap <buffer> <ESC>   :NERDTreeClose<CR>
+  nmap <buffer> <c-c>   :NERDTreeClose<CR>
+  nmap <buffer> `   :NERDTreeClose<CR>
+  nmap <buffer> q   :NERDTreeClose<CR>
+endfunction
 
 " NERDTree tabs
 let g:nerdtree_tabs_open_on_console_startup = 0
 let g:nerdtree_tabs_open_on_gui_startup = 0
 let g:nerdtree_tabs_open_on_new_tab = 0
 let g:nerdtree_tabs_autofind = 1
+
+" NERDTree git
+let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "M",
+    \ "Staged"    : "+",
+    \ "Untracked" : "?",
+    \ "Renamed"   : "R",
+    \ "Unmerged"  : "C",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔︎",
+    \ 'Ignored'   : '☒',
+    \ "Unknown"   : "?"
+    \ }
 
 nnoremap <leader>k :Bclose<CR>
 
@@ -239,8 +277,9 @@ nnoremap <silent><S-w> :<C-u>call search('\<\<Bar>\U\@<=\u\<Bar>\u\ze\%(\U\&\>\@
 noremap <C-S> :w<CR>
 vnoremap <C-T> :tabnew %:p:h<CR>
 noremap <F11> <C-u>:wincmd o<CR>
-autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif " Return to last edit position when opening files (You want this!)
 set autoindent
+set shm=at
+set cmdheight=2
 set nosmartindent
 set nocindent
 set backspace=eol,start,indent
@@ -278,7 +317,7 @@ set splitright
 set tabstop=2
 set undodir=/Users/frank/.vim/undodir/
 set undofile
-set viminfo^=% " Remember info about open buffers on close
+"set viminfo^=% " Remember info about open buffers on close
 
 " wild
 set whichwrap+=<,>,h,l
@@ -344,15 +383,6 @@ if has('persistent_undo')
   set undofile
 endif
 
-autocmd FileType nerdtree call s:nerdtree_settings()
-function! s:nerdtree_settings()
-  " Play nice with supertab
-  " Enable navigation with control-j and control-k in insert mode
-  nmap <buffer> <ESC>   :NERDTreeClose<CR>
-  nmap <buffer> <c-c>   :NERDTreeClose<CR>
-  nmap <buffer> `   :NERDTreeClose<CR>
-  nmap <buffer> q   :NERDTreeClose<CR>
-endfunction
 
 "airline
 let g:airline#extensions#tabline#enabled = 1
@@ -373,32 +403,42 @@ let g:jsx_ext_required = 0
 
 " startify
 
-    let g:startify_enable_special         = 0
-    let g:startify_files_number           = 8
-    let g:startify_relative_path          = 1
-    let g:startify_change_to_dir          = 1
-    let g:startify_update_oldfiles        = 1
-    let g:startify_session_autoload       = 1
-    let g:startify_session_persistence    = 1
+let g:startify_files_number           = 8
+let g:startify_change_to_dir          = 1
+let g:startify_update_oldfiles        = 1
+let g:startify_session_autoload       = 1
+let g:startify_session_persistence    = 1
 
-    let g:startify_skiplist = [
-            \ 'COMMIT_EDITMSG',
-            \ '.*\/doc\/.*',
-            \ ]
+let g:startify_bookmarks = [
+        \ { 'c': '~/.vimrc' },
+        \ ]
 
-    let g:startify_bookmarks = [
-            \ { 'c': '~/.vimrc' },
-            \ ]
+let g:startify_custom_header =
+        \ startify#fortune#cowsay('═','║','╔','╗','╝','╚')
 
-    let g:startify_custom_header =
-            \ startify#fortune#cowsay('═','║','╔','╗','╝','╚')
+let g:startify_custom_footer =
+       \ ['', "   Vim is charityware. Please read ':help uganda'.", '']
 
-    let g:startify_custom_footer =
-           \ ['', "   Vim is charityware. Please read ':help uganda'.", '']
+let g:startify_list_order = [
+      \ ['  # 最近使用的文件'],
+      \ 'files',
+      \ ['  # 会话'],
+      \ 'sessions',
+      \ ['  # 书签'],
+      \ 'bookmarks'
+      \ ]
 
-    let g:startify_list_order = ['files', 'bookmarks', 'sessions', 'commands']
-
-nnoremap <leader>h :<c-u>cd %:h<CR>
+nnoremap <leader>h :<c-u>:ProjectRootCD<cr>
 nnoremap <leader>b :<c-u>silent exec "!open %:p"<CR>
 autocmd FileType javascript imap <buffer> <c-l> <c-o>:<c-u>silent exec "!prettier --single-quote --trailing-comma es5 --print-width 120 --semi false --write %:p" \| echon '已格式化' <CR>
 autocmd FileType javascript nmap <buffer> <c-l> :<c-u>silent exec "!prettier --single-quote --trailing-comma es5 --print-width 120 --semi false --write %:p" \| echon '已格式化' <CR>
+autocmd FileType gitcommit call setpos('.', [0, 1, 1, 0])
+fun! RememberLine()
+    if &ft =~ 'gitcommit'
+        return
+    endif
+    if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif 
+endfun
+" Return to last edit position when opening files (You want this!)
+autocmd BufReadPost * call RememberLine()
+let g:committia_min_window_width=120
