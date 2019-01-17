@@ -9,9 +9,10 @@ set autowriteall
 
 call plug#begin('~/.vim/plugged')
 Plug 'Shutnik/jshint2.vim'
+Plug 'editorconfig/editorconfig-vim'
 Plug 'rhysd/committia.vim'
 Plug 'dbakker/vim-projectroot'
-Plug 'posva/vim-vue'
+"Plug 'posva/vim-vue'
 Plug 'mhinz/vim-startify'
 Plug 'mxw/vim-jsx'
 Plug 'Yggdroot/indentLine'
@@ -174,8 +175,10 @@ nnoremap <c-e> :CtrlPMRUFiles<CR>
 inoremap <c-e> <c-o>:CtrlPMRUFiles<CR>
 noremap <c-g> <c-o>:Ag<CR>
 let g:ctrlp_use_caching = 0
-set grepprg=ag\ --nogroup\ --nocolor
-let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+  if executable('ag')
+  set grepprg=ag\ --nogroup\ --nocolor
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+endif
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_root_markers = ['.git']
 
@@ -188,7 +191,9 @@ let g:ctrlp_prompt_mappings = {
 
 autocmd Filetype ruby,coffee,sass,scss,jade,erb setlocal ts=2 sw=2
 autocmd Filetype md,markdown setlocal ts=4 sw=4
-autocmd Filetype mk,markdown setlocal expandtab
+autocmd Filetype md,markdown setlocal expandtab
+autocmd BufNewFile,BufRead *.md setlocal ts=4 sw=4
+autocmd BufNewFile,BufRead *.md setlocal expandtab
 au BufNewFile,BufRead *.vue setlocal filetype=vue
 autocmd Filetype vue setlocal filetype=html
 autocmd Filetype coffee SnipMateLoadScope eruby
@@ -302,7 +307,7 @@ set switchbuf=usetab
 set nolinebreak
 set noswapfile
 set nowb
-set wrap
+set nowrap
 set pastetoggle=<F4>
 set relativenumber
 set number
@@ -403,21 +408,11 @@ let g:jsx_ext_required = 0
 
 " startify
 
-let g:startify_files_number           = 8
-let g:startify_change_to_dir          = 1
-let g:startify_update_oldfiles        = 1
-let g:startify_session_autoload       = 1
-let g:startify_session_persistence    = 1
+let g:startify_files_number           = 20
 
 let g:startify_bookmarks = [
         \ { 'c': '~/.vimrc' },
         \ ]
-
-let g:startify_custom_header =
-        \ startify#fortune#cowsay('═','║','╔','╗','╝','╚')
-
-let g:startify_custom_footer =
-       \ ['', "   Vim is charityware. Please read ':help uganda'.", '']
 
 let g:startify_list_order = [
       \ ['  # 最近使用的文件'],
@@ -430,8 +425,8 @@ let g:startify_list_order = [
 
 nnoremap <leader>h :<c-u>:ProjectRootCD<cr>
 nnoremap <leader>b :<c-u>silent exec "!open %:p"<CR>
-autocmd FileType javascript imap <buffer> <c-l> <c-o>:<c-u>silent exec "!prettier --single-quote --trailing-comma es5 --print-width 120 --semi false --write %:p" \| echon '已格式化' <CR>
-autocmd FileType javascript nmap <buffer> <c-l> :<c-u>silent exec "!prettier --single-quote --trailing-comma es5 --print-width 120 --semi false --write %:p" \| echon '已格式化' <CR>
+autocmd FileType javascript imap <buffer> <c-l> <c-o>:<c-u>silent exec "!prettier --single-quote --trailing-comma es5 --print-width 120 --semi false --write %:p"<CR>
+autocmd FileType javascript nmap <buffer> <c-l> :<c-u>silent exec "!prettier --single-quote --trailing-comma es5 --print-width 120 --semi false --write %:p"<CR>
 autocmd FileType gitcommit call setpos('.', [0, 1, 1, 0])
 fun! RememberLine()
     if &ft =~ 'gitcommit'
